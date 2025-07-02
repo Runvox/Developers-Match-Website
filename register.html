@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | DevMatch</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .register-container {
+      max-width: 450px;
+      margin: 4rem auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .register-container h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .register-form {
+      position: relative;
+    }
+
+    .register-form input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .password-field {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #555;
+    }
+
+    .register-form button[type="submit"] {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #2575fc;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .strength-meter {
+      height: 10px;
+      background: #ddd;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      background: red;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-container">
+    <h2>Create Account</h2>
+    <form class="register-form" onsubmit="return validateForm(event)">
+      
+      <input type="email" id="email" placeholder="Email" required />
+      
+      <div class="password-field">
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="button" class="toggle-password" onclick="toggleVisibility('password', this)">👁️</button>
+      </div>
+      
+      <div class="strength-meter"><div class="strength-bar" id="strength-bar"></div></div>
+      
+      <div class="password-field">
+        <input type="password" id="confirm-password" placeholder="Confirm Password" required />
+        <button type="button" class="toggle-password" onclick="toggleVisibility('confirm-password', this)">👁️</button>
+      </div>
+
+      <div class="error" id="password-error"></div>
+      
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script>
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm-password');
+    const errorDiv = document.getElementById('password-error');
+    const strengthBar = document.getElementById('strength-bar');
+
+    function checkStrength(password) {
+      let strength = 0;
+      if (password.length >= 12) strength += 1;
+      if (/[A-Z]/.test(password)) strength += 1;
+      if (/[0-9]/.test(password)) strength += 1;
+      if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+
+      const percent = (strength / 4) * 100;
+      strengthBar.style.width = percent + '%';
+      strengthBar.style.background =
+        strength < 2 ? 'red' :
+        strength < 3 ? 'orange' :
+        'green';
+    }
+
+    passwordInput.addEventListener('input', () => {
+      checkStrength(passwordInput.value);
+    });
+
+    function validateForm(event) {
+      const password = passwordInput.value;
+      const confirm = confirmInput.value;
+
+      if (password !== confirm) {
+        errorDiv.textContent = 'Passwords do not match.';
+        event.preventDefault();
+        return false;
+      }
+
+      const isLong = password.length >= 12;
+      const hasUpper = /[A-Z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+      const hasSymbol = /[^A-Za-z0-9]/.test(password);
+
+      if (!isLong || !hasUpper || !hasNumber || !hasSymbol) {
+        errorDiv.textContent = 'Password must be at least 12 characters and include a capital letter, a number and a symbol.';
+        event.preventDefault();
+        return false;
+      }
+
+      errorDiv.textContent = '';
+      return true;
+    }
+
+    function toggleVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      btn.textContent = isPassword ? '🙈' : '👁️';
+    }
+  </script>
+
+</body>
+</html>
